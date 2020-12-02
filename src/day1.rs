@@ -5,6 +5,13 @@ use std::io::prelude::*;
 use std::io::BufReader;
 use std::path::Path;
 
+// O(N) algorithm:
+// * keep a set of numbers we've seen before
+// * read each line, convert to integer
+// * figure out what the matching entry would be via subtraction
+// * if we have that in the set, then multiply and quit
+// * otherwise add to the set and move to next line
+
 pub fn solve(input: &'static str) -> Result<u32, io::Error> {
     let path = Path::new(input);
     let file = File::open(&path)?;
