@@ -1,9 +1,20 @@
 use std::collections::BTreeSet;
 use std::fs::File;
-use std::io;
 use std::io::prelude::*;
 use std::io::BufReader;
+use std::iter::FromIterator;
 use std::path::Path;
+
+fn read_numbers(filepath: &'static str) -> impl Iterator<Item = u32> {
+    let path = Path::new(filepath);
+    let file = File::open(&path).unwrap();
+    let reader = BufReader::new(file);
+
+    reader
+        .lines()
+        .filter_map(Result::ok)
+        .filter_map(|line| line.parse::<u32>().ok())
+}
 
 // O(N) algorithm:
 // * keep a set of numbers we've seen before
@@ -12,19 +23,28 @@ use std::path::Path;
 // * if we have that in the set, then multiply and quit
 // * otherwise add to the set and move to next line
 
-pub fn solve(input: &'static str) -> Result<u32, io::Error> {
-    let path = Path::new(input);
-    let file = File::open(&path)?;
-    let reader = BufReader::new(file);
+pub fn solve(input: &'static str) -> u32 {
     let mut entries = BTreeSet::new();
-    for line in reader.lines() {
-        if let Ok(entry) = line {
-            let n = u32::from_str_radix(&entry, 10).expect("line was not a number");
-            let target = 2020 - n;
-            if entries.contains(&target) {
-                return Ok(n * target);
+    for n in read_numbers(input) {
+        let target = 2020 - n;
+        if entries.contains(&target) {
+            return n * target;
+        }
+        entries.insert(n);
+    }
+    panic!("no solution found");
+}
+
+pub fn solve2(input: &'static str) -> u32 {
+    let entries = BTreeSet::from_iter(read_numbers(input));
+
+    for a in entries.iter() {
+        let a_upper = 2020 - a;
+        for b in entries.range(0..a_upper) {
+            let c = 2020 - a - b;
+            if entries.contains(&c) {
+                return a * b * c;
             }
-            entries.insert(n);
         }
     }
     panic!("no solution found");
