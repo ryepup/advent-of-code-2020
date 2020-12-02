@@ -23,7 +23,7 @@ impl FromStr for Entry {
     fn from_str(line: &str) -> Result<Self, <Self as FromStr>::Err> {
         lazy_static! {
             static ref RE: Regex =
-                Regex::new(r"^(?P<min>\d)-(?P<max>\d) (?P<l>[a-zA-Z]): (?P<pass>.+)$").unwrap();
+                Regex::new(r"^(?P<min>\d+)-(?P<max>\d+) (?P<l>[a-zA-Z]): (?P<pass>.+)$").unwrap();
         }
         let caps = RE.captures(line).expect("failed to parse!");
         let policy = RangeInclusive::new(
