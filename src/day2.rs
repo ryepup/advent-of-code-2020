@@ -46,8 +46,29 @@ pub fn solve(filepath: &'static str) -> usize {
     read_lines::<Entry>(filepath).filter(is_compliant1).count()
 }
 
+pub fn solve2(filepath: &'static str) -> usize {
+    read_lines::<Entry>(filepath).filter(is_compliant2).count()
+}
+
 fn is_compliant1(entry: &Entry) -> bool {
     let occurrences = entry.password.matches(entry.letter).count();
 
     entry.min >= occurrences && occurrences <= entry.max
+}
+
+// Each policy actually describes two positions in the password, where 1 means
+// the first character, 2 means the second character, and so on. (Be careful;
+// Toboggan Corporate Policies have no concept of "index zero"!) Exactly one of
+// these positions must contain the given letter. Other occurrences of the
+// letter are irrelevant for the purposes of policy enforcement.
+
+fn is_compliant2(entry: &Entry) -> bool {
+    let position_matches = entry
+        .password
+        .match_indices(entry.letter)
+        .map(|t| t.0 + 1) // (Be careful; Toboggan Corporate Policies have no concept of "index zero"!)
+        .filter(|i| i == &entry.max || i == &entry.min)
+        .count();
+
+    position_matches == 1
 }
