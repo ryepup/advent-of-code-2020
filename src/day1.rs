@@ -12,7 +12,6 @@ pub fn solve(input: &'static str) -> Result<u32, io::Error> {
     let mut entries = BTreeSet::new();
     for line in reader.lines() {
         if let Ok(entry) = line {
-            println!("read '{}'", entry);
             let n = u32::from_str_radix(&entry, 10).expect("line was not a number");
             let target = 2020 - n;
             if entries.contains(&target) {

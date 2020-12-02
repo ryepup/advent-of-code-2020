@@ -2,5 +2,5 @@ use advent2020::day1;
 
 #[test]
 fn solve() {
-    assert_eq!(514579, day1::solve("./tests/day1.test").unwrap());
+    assert_eq!(514579, day1::solve("./data/day1.test.txt").unwrap());
 }
