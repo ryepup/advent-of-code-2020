@@ -7,7 +7,7 @@ use std::path::Path;
 
 fn read_numbers(filepath: &'static str) -> impl Iterator<Item = u32> {
     let path = Path::new(filepath);
-    let file = File::open(&path).unwrap();
+    let file = File::open(&path).expect("could not read path");
     let reader = BufReader::new(file);
 
     reader
@@ -34,6 +34,14 @@ pub fn solve(input: &'static str) -> u32 {
     }
     panic!("no solution found");
 }
+
+// O(N^2) algorithm
+// * pull all entries into a set
+// * iterate through every element `a`
+//   * calculate the maximum `b` such that a + b + c = 2020
+//   * iterate through elements < `b`
+//     * calculate `c` such that a + b + c = 2020
+//     * if `c` exists in our entries, then we've found the solution
 
 pub fn solve2(input: &'static str) -> u32 {
     let entries = BTreeSet::from_iter(read_numbers(input));
