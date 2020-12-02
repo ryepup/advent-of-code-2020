@@ -6,7 +6,6 @@ extern crate regex;
 
 use crate::utils::*;
 use regex::Regex;
-use std::ops::RangeInclusive;
 use std::str::FromStr;
 
 // algorithm: O(N)
@@ -15,7 +14,10 @@ use std::str::FromStr;
 // * count the wins
 
 struct Entry {
-    is_compliant: bool,
+    min: usize,
+    max: usize,
+    password: String,
+    letter: char,
 }
 
 impl FromStr for Entry {
@@ -26,16 +28,14 @@ impl FromStr for Entry {
                 Regex::new(r"^(?P<min>\d+)-(?P<max>\d+) (?P<l>[a-zA-Z]): (?P<pass>.+)$").unwrap();
         }
         let caps = RE.captures(line).expect("failed to parse!");
-        let policy = RangeInclusive::new(
-            caps["min"].parse::<usize>().unwrap(),
-            caps["max"].parse::<usize>().unwrap(),
-        );
-        let letter = &caps["l"];
-        let password = &caps["pass"];
-        let occurrences = password.matches(letter).count();
 
         let entry = Entry {
-            is_compliant: policy.contains(&occurrences),
+            min: caps["min"].parse::<usize>().unwrap(),
+            max: caps["max"].parse::<usize>().unwrap(),
+            letter: caps["l"].chars().next().unwrap(),
+            // making a copy here; FromStr doesn't support lifetimes so
+            // we can't borrow the string slice
+            password: caps["pass"].to_string(),
         };
 
         Ok(entry)
@@ -43,7 +43,11 @@ impl FromStr for Entry {
 }
 
 pub fn solve(filepath: &'static str) -> usize {
-    read_lines::<Entry>(filepath)
-        .filter(|e| e.is_compliant)
-        .count()
+    read_lines::<Entry>(filepath).filter(is_compliant1).count()
+}
+
+fn is_compliant1(entry: &Entry) -> bool {
+    let occurrences = entry.password.matches(entry.letter).count();
+
+    entry.min >= occurrences && occurrences <= entry.max
 }
