@@ -1,6 +1,4 @@
 use crate::utils::*;
-use std::ops::Index;
-use std::str::FromStr;
 
 #[derive(PartialEq, Eq)]
 enum Tile {
@@ -8,51 +6,52 @@ enum Tile {
     Tree,
 }
 
-struct Row {
-    tiles: Vec<Tile>,
-}
-
-impl Row {
-    fn len(&self) -> usize {
-        self.tiles.len()
+impl From<char> for Tile {
+    fn from(c: char) -> Tile {
+        match c {
+            '.' => Tile::Open,
+            '#' => Tile::Tree,
+            _ => panic!("unknown tile"),
+        }
     }
 }
 
-impl Index<usize> for Row {
-    type Output = Tile;
-    fn index(&self, idx: usize) -> &Self::Output {
-        &self.tiles[idx]
-    }
+fn parse_row(line: String) -> Vec<Tile> {
+    line.chars().map(Tile::from).collect()
 }
 
-impl FromStr for Row {
-    type Err = &'static str;
-    fn from_str(line: &str) -> Result<Row, Self::Err> {
-        let tiles: Vec<Tile> = line
-            .chars()
-            .map(|c| match c {
-                '.' => Tile::Open,
-                '#' => Tile::Tree,
-                _ => panic!("unknown tile"),
-            })
-            .collect();
-
-        Ok(Row { tiles: tiles })
-    }
+fn parse_forest(filepath: &'static str) -> Vec<Vec<Tile>> {
+    read_lines(filepath).map(parse_row).collect()
 }
 
 pub fn solve(filepath: &'static str) -> u32 {
-    let forest: Vec<Row> = read_lines::<Row>(filepath).collect();
+    let forest = parse_forest(filepath);
 
+    travel(&forest, 1, 3)
+}
+
+pub fn solve2(filepath: &'static str) -> u32 {
+    let forest = parse_forest(filepath);
+
+    travel(&forest, 1, 1)
+        * travel(&forest, 1, 3)
+        * travel(&forest, 1, 5)
+        * travel(&forest, 1, 7)
+        * travel(&forest, 2, 1)
+}
+
+fn travel(forest: &Vec<Vec<Tile>>, down: usize, right: usize) -> u32 {
     let mut hits = 0;
     let mut x = 0;
-    let offset = 3;
+    let mut y = 0;
 
-    for row in forest {
-        if row[x] == Tile::Tree {
+    while y < forest.len() {
+        if forest[y][x] == Tile::Tree {
             hits = hits + 1;
         }
-        x = (x + offset) % row.len()
+        x = (x + right) % forest[y].len();
+        y = y + down;
     }
+
     hits
 }

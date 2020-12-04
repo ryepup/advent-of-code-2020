@@ -11,7 +11,7 @@ use std::iter::FromIterator;
 
 pub fn solve(input: &'static str) -> u32 {
     let mut entries = BTreeSet::new();
-    for n in read_lines::<u32>(input) {
+    for n in parse_lines::<u32>(input) {
         let target = 2020 - n;
         if entries.contains(&target) {
             return n * target;
@@ -30,7 +30,7 @@ pub fn solve(input: &'static str) -> u32 {
 //     * if `c` exists in our entries, then we've found the solution
 
 pub fn solve2(input: &'static str) -> u32 {
-    let entries = BTreeSet::from_iter(read_lines::<u32>(input));
+    let entries = BTreeSet::from_iter(parse_lines::<u32>(input));
 
     for a in entries.iter() {
         let a_upper = 2020 - a;

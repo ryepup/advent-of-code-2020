@@ -43,11 +43,11 @@ impl FromStr for Entry {
 }
 
 pub fn solve(filepath: &'static str) -> usize {
-    read_lines::<Entry>(filepath).filter(is_compliant1).count()
+    parse_lines::<Entry>(filepath).filter(is_compliant1).count()
 }
 
 pub fn solve2(filepath: &'static str) -> usize {
-    read_lines::<Entry>(filepath).filter(is_compliant2).count()
+    parse_lines::<Entry>(filepath).filter(is_compliant2).count()
 }
 
 fn is_compliant1(entry: &Entry) -> bool {
